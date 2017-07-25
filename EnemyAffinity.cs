@@ -5,8 +5,5 @@
 	FIRE,
 	WATER,
 	EARTH,
-	AIR,
-
-	//	This is a "trick" to get the length of the enum with EnemyAffinity.Length
-	Length
+	AIR
 }
