@@ -77,7 +77,12 @@ public class BattleEntityEditor : Editor
 	{
 		serializedObject.Update();
 
-		//	Display property fields and sanitize inputs if expected values are inadequate
+		//	Show the standard script line
+		GUI.enabled = false;
+		EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((BattleEntity)target), typeof(BattleEntity), false);
+		GUI.enabled = true;
+
+		//	Force a warning message if no name is specified
 		EditorGUILayout.LabelField("Top-level information", EditorStyles.boldLabel);
 		EditorGUILayout.PropertyField(entityName);
 		if( entityName.stringValue.Length <= 0 )
@@ -86,6 +91,7 @@ public class BattleEntityEditor : Editor
 		}
 		EditorGUILayout.Space();
 
+		//	Sanitization of battle stats occurs in BattleEntity.OnValidate
 		EditorGUILayout.LabelField("General battle stats", EditorStyles.boldLabel);
 		EditorGUILayout.PropertyField(hp);
 		EditorGUILayout.PropertyField(mp);
@@ -96,6 +102,7 @@ public class BattleEntityEditor : Editor
 		EditorGUILayout.PropertyField(speed);
 		EditorGUILayout.Space();
 
+		//	Show/hide enum dropdowns and reset as necessary
 		EditorGUILayout.LabelField("Specify affinities", EditorStyles.boldLabel);
 		EditorGUILayout.PropertyField(isEnemy);
 		if( isEnemy.boolValue )
@@ -110,8 +117,6 @@ public class BattleEntityEditor : Editor
 		}
 		EditorGUILayout.Space();
 
-
 		serializedObject.ApplyModifiedProperties();
 	}
-
 }
