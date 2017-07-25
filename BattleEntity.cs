@@ -26,7 +26,92 @@ public class BattleEntity : MonoBehaviour
 	void OnValidate()
 	{
 		//	Ensure ranges make sense by enforcing non-zero minimum values for certain stats
+		//	The custom editor will conform to these standards
 		hp = (uint)Mathf.Max(1, hp);
 		speed = (uint)Mathf.Max(1, speed);
 	}
+}
+
+[CustomEditor(typeof(BattleEntity))]
+[CanEditMultipleObjects]
+public class BattleEntityEditor : Editor
+{
+	SerializedProperty entityName,
+		isEnemy,
+		hp,
+		mp,
+		attack,
+		defense,
+		magicAttack,
+		magicDefense,
+		speed,
+		playerAffinity,
+		enemyAffinity;
+
+	void OnEnable()
+	{
+		entityName = serializedObject.FindProperty("entityName");
+		isEnemy = serializedObject.FindProperty("isEnemy");
+		hp = serializedObject.FindProperty("hp");
+		mp = serializedObject.FindProperty("mp");
+		attack = serializedObject.FindProperty("attack");
+		defense = serializedObject.FindProperty("defense");
+		magicAttack = serializedObject.FindProperty("magicAttack");
+		magicDefense = serializedObject.FindProperty("magicDefense");
+		speed = serializedObject.FindProperty("speed");
+		playerAffinity = serializedObject.FindProperty("playerAffinity");
+		enemyAffinity = serializedObject.FindProperty("enemyAffinity");
+	}
+
+	private void ResetPlayerAffinity()
+	{
+		playerAffinity.enumValueIndex = (int)PlayerAffinity.NONE;
+	}
+
+	private void ResetEnemyAffinity()
+	{
+		enemyAffinity.enumValueIndex = (int)EnemyAffinity.NONE;
+	}
+
+	public override void OnInspectorGUI()
+	{
+		serializedObject.Update();
+
+		//	Display property fields and sanitize inputs if expected values are inadequate
+		EditorGUILayout.LabelField("Top-level information", EditorStyles.boldLabel);
+		EditorGUILayout.PropertyField(entityName);
+		if( entityName.stringValue.Length <= 0 )
+		{
+			EditorGUILayout.LabelField("A name must be specified for the entity!", EditorStyles.centeredGreyMiniLabel);
+		}
+		EditorGUILayout.Space();
+
+		EditorGUILayout.LabelField("General battle stats", EditorStyles.boldLabel);
+		EditorGUILayout.PropertyField(hp);
+		EditorGUILayout.PropertyField(mp);
+		EditorGUILayout.PropertyField(attack);
+		EditorGUILayout.PropertyField(defense);
+		EditorGUILayout.PropertyField(magicAttack);
+		EditorGUILayout.PropertyField(magicDefense);
+		EditorGUILayout.PropertyField(speed);
+		EditorGUILayout.Space();
+
+		EditorGUILayout.LabelField("Specify affinities", EditorStyles.boldLabel);
+		EditorGUILayout.PropertyField(isEnemy);
+		if( isEnemy.boolValue )
+		{
+			ResetPlayerAffinity();
+			EditorGUILayout.PropertyField(enemyAffinity);
+		}
+		else
+		{
+			ResetEnemyAffinity();
+			EditorGUILayout.PropertyField(playerAffinity);
+		}
+		EditorGUILayout.Space();
+
+
+		serializedObject.ApplyModifiedProperties();
+	}
+
 }
