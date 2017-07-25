@@ -8,13 +8,13 @@ public class BattleEntity : MonoBehaviour
 	public bool isEnemy;
 
 	//	General battle stats
-	public uint maxHp;
+	public uint maxHp = 1;
 	public uint maxMp;
 	public uint attack;
 	public uint defense;
 	public uint magicAttack;
 	public uint magicDefense;
-	public uint speed;
+	public uint speed = 1;
 
 	//	Player-specific stats
 	public PlayerAffinity playerAffinity;
