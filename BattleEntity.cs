@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 
 public class BattleEntity : MonoBehaviour
@@ -10,8 +8,8 @@ public class BattleEntity : MonoBehaviour
 	public bool isEnemy;
 
 	//	General battle stats
-	public uint hp;
-	public uint mp;
+	public uint maxHp;
+	public uint maxMp;
 	public uint attack;
 	public uint defense;
 	public uint magicAttack;
@@ -26,12 +24,65 @@ public class BattleEntity : MonoBehaviour
 	public uint experience;
 	public uint gold;
 
+	//	Private stats
+	private uint currentHp;
+	private uint currentMp;
+
+	//	Boolean accessors
+	public bool IsEnemy { get { return isEnemy; } }
+	public bool IsPlayer { get { return !isEnemy; } }
+	public bool IsAlive { get { return currentHp > 0; } }
+	public bool IsDead { get { return currentHp <= 0; } }
+	public bool IsAtFullHealth { get { return currentHp == maxHp; } }
+	public bool IsOutOfMp { get { return currentMp <= 0; } }
+	public bool IsAtFullMp { get { return currentMp == maxMp; } }
+
+	//	HP and MP accessors
+	public uint CurrentHP
+	{
+		get { return currentHp; }
+		private set { currentHp = (uint)Mathf.Clamp(value, 0, maxHp); }
+	}
+
+	public uint CurrentMP
+	{
+		get { return currentMp; }
+		private set { currentMp = (uint)Mathf.Clamp(value, 0, maxMp); }
+	}
+
+	//	Simple initialization to set the current values to their max values
+	public void Initialize()
+	{
+		currentHp = maxHp;
+		currentMp = maxMp;
+	}
+
+	//	Basic damage and healing methods
+	public void DamageByHp(uint damage)
+	{
+		CurrentHP -= damage;
+	}
+
+	public void HealByHP(uint health)
+	{
+		CurrentHP += health;
+	}
+
+	public void UseMp(uint mp)
+	{
+		CurrentMP -= mp;
+	}
+
+	public void RecoverMp(uint mp)
+	{
+		CurrentMP += mp;
+	}
+
+	//	Ensure ranges make sense by enforcing non-zero minimum values for certain stats
 	[ExecuteInEditMode]
 	void OnValidate()
 	{
-		//	Ensure ranges make sense by enforcing non-zero minimum values for certain stats
-		//	The custom editor will conform to these standards
-		hp = (uint)Mathf.Max(1, hp);
+		maxHp = (uint)Mathf.Max(1, maxHp);
 		speed = (uint)Mathf.Max(1, speed);
 	}
 }
@@ -42,8 +93,8 @@ public class BattleEntityEditor : Editor
 {
 	SerializedProperty entityName,
 		isEnemy,
-		hp,
-		mp,
+		maxHp,
+		maxMp,
 		attack,
 		defense,
 		magicAttack,
@@ -58,8 +109,8 @@ public class BattleEntityEditor : Editor
 	{
 		entityName = serializedObject.FindProperty("entityName");
 		isEnemy = serializedObject.FindProperty("isEnemy");
-		hp = serializedObject.FindProperty("hp");
-		mp = serializedObject.FindProperty("mp");
+		maxHp = serializedObject.FindProperty("maxHp");
+		maxMp = serializedObject.FindProperty("maxMp");
 		attack = serializedObject.FindProperty("attack");
 		defense = serializedObject.FindProperty("defense");
 		magicAttack = serializedObject.FindProperty("magicAttack");
@@ -103,8 +154,8 @@ public class BattleEntityEditor : Editor
 
 		//	Sanitization of battle stats occurs in BattleEntity.OnValidate
 		EditorGUILayout.LabelField("General battle stats", EditorStyles.boldLabel);
-		EditorGUILayout.PropertyField(hp);
-		EditorGUILayout.PropertyField(mp);
+		EditorGUILayout.PropertyField(maxHp);
+		EditorGUILayout.PropertyField(maxMp);
 		EditorGUILayout.PropertyField(attack);
 		EditorGUILayout.PropertyField(defense);
 		EditorGUILayout.PropertyField(magicAttack);
