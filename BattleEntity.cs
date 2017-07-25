@@ -18,9 +18,13 @@ public class BattleEntity : MonoBehaviour
 	public uint magicDefense;
 	public uint speed;
 
-	//	Entity-specific affinities
+	//	Player-specific stats
 	public PlayerAffinity playerAffinity;
+
+	//	Enemy-specific stats
 	public EnemyAffinity enemyAffinity;
+	public uint experience;
+	public uint gold;
 
 	[ExecuteInEditMode]
 	void OnValidate()
@@ -46,7 +50,9 @@ public class BattleEntityEditor : Editor
 		magicDefense,
 		speed,
 		playerAffinity,
-		enemyAffinity;
+		enemyAffinity,
+		experience,
+		gold;
 
 	void OnEnable()
 	{
@@ -61,16 +67,20 @@ public class BattleEntityEditor : Editor
 		speed = serializedObject.FindProperty("speed");
 		playerAffinity = serializedObject.FindProperty("playerAffinity");
 		enemyAffinity = serializedObject.FindProperty("enemyAffinity");
+		experience = serializedObject.FindProperty("experience");
+		gold = serializedObject.FindProperty("gold");
 	}
 
-	private void ResetPlayerAffinity()
+	private void ResetPlayerProperties()
 	{
 		playerAffinity.enumValueIndex = (int)PlayerAffinity.NONE;
 	}
 
-	private void ResetEnemyAffinity()
+	private void ResetEnemyProperties()
 	{
 		enemyAffinity.enumValueIndex = (int)EnemyAffinity.NONE;
+		experience.intValue = 0;
+		gold.intValue = 0;
 	}
 
 	public override void OnInspectorGUI()
@@ -103,16 +113,22 @@ public class BattleEntityEditor : Editor
 		EditorGUILayout.Space();
 
 		//	Show/hide enum dropdowns and reset as necessary
-		EditorGUILayout.LabelField("Specify affinities", EditorStyles.boldLabel);
+		EditorGUILayout.LabelField("Specify if entity is a player or enemy", EditorStyles.boldLabel);
 		EditorGUILayout.PropertyField(isEnemy);
+		EditorGUILayout.Space();
+
 		if( isEnemy.boolValue )
 		{
-			ResetPlayerAffinity();
+			EditorGUILayout.LabelField("Enemy-specific stats", EditorStyles.boldLabel);
+			ResetPlayerProperties();
 			EditorGUILayout.PropertyField(enemyAffinity);
+			EditorGUILayout.PropertyField(experience);
+			EditorGUILayout.PropertyField(gold);
 		}
 		else
 		{
-			ResetEnemyAffinity();
+			EditorGUILayout.LabelField("Player-specific stats", EditorStyles.boldLabel);
+			ResetEnemyProperties();
 			EditorGUILayout.PropertyField(playerAffinity);
 		}
 		EditorGUILayout.Space();
